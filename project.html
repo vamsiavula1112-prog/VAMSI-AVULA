@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeLearn Pro - Interactive Programming Education</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .code-editor {
+            font-family: 'Courier New', monospace;
+            background: #1e1e1e;
+            color: #d4d4d4;
+        }
+        .syntax-error { color: #f44336; }
+        .syntax-keyword { color: #569cd6; }
+        .syntax-string { color: #ce9178; }
+        .syntax-comment { color: #6a9955; }
+        .pulse-error { animation: pulse 1s infinite; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-lg border-b-4 border-blue-500">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-lg">💻</span>
+                    </div>
+                    <h1 class="text-2xl font-bold text-gray-800">CodeLearn Pro</h1>
+                </div>
+                <nav class="flex space-x-6">
+                    <button onclick="switchTab('editor')" id="tab-editor" class="px-4 py-2 rounded-lg bg-blue-500 text-white font-medium">Code Editor</button>
+                    <button onclick="switchTab('exercises')" id="tab-exercises" class="px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 font-medium">Exercises</button>
+                    <button onclick="switchTab('tutorials')" id="tab-tutorials" class="px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 font-medium">Tutorials</button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto px-6 py-8">
+        <!-- Code Editor Tab -->
+        <div id="editor-tab" class="tab-content">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Code Editor Panel -->
+                <div class="lg:col-span-2 bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="bg-gray-800 px-6 py-3 flex items-center justify-between">
+                        <h2 class="text-white font-semibold">Code Editor</h2>
+                        <div class="flex space-x-2">
+                            <select id="language-select" class="bg-gray-700 text-white px-3 py-1 rounded text-sm">
+                                <option value="javascript">JavaScript</option>
+                                <option value="python">Python</option>
+                                <option value="java">Java</option>
+                            </select>
+                            <button onclick="runCode()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-1 rounded text-sm font-medium">▶ Run</button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <textarea id="code-input" class="code-editor w-full h-64 p-4 rounded-lg border resize-none" placeholder="// Write your code here...
+function greetUser(name) {
+    console.log('Hello, ' + name + '!');
+}
+
+greetUser('World');">// Write your code here...
+function greetUser(name) {
+    console.log('Hello, ' + name + '!');
+}
+
+greetUser('World');</textarea>
+                    </div>
+                </div>
+
+                <!-- Analysis & Debugging Panel -->
+                <div class="space-y-6">
+                    <!-- Error Detection -->
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                            🔍 Code Analysis
+                        </h3>
+                        <div id="error-display" class="space-y-2">
+                            <div class="text-green-600 text-sm">✅ No syntax errors detected</div>
+                        </div>
+                    </div>
+
+                    <!-- Debugging Suggestions -->
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                            🛠️ Debugging Tips
+                        </h3>
+                        <div id="debug-suggestions" class="space-y-2">
+                            <div class="text-blue-600 text-sm">💡 Consider adding error handling for edge cases</div>
+                            <div class="text-blue-600 text-sm">💡 Use descriptive variable names for better readability</div>
+                        </div>
+                    </div>
+
+                    <!-- Output Console -->
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Console Output</h3>
+                        <div id="console-output" class="bg-gray-900 text-green-400 p-4 rounded-lg font-mono text-sm min-h-24">
+                            Ready to run code...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Exercises Tab -->
+        <div id="exercises-tab" class="tab-content hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">Beginner</span>
+                        <span class="text-gray-500 text-sm">⭐ 4.8</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Variables & Data Types</h3>
+                    <p class="text-gray-600 text-sm mb-4">Learn to declare variables and work with different data types in JavaScript.</p>
+                    <button onclick="loadExercise('variables')" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg font-medium">Start Exercise</button>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">Intermediate</span>
+                        <span class="text-gray-500 text-sm">⭐ 4.6</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Functions & Scope</h3>
+                    <p class="text-gray-600 text-sm mb-4">Master function declarations, parameters, and variable scope concepts.</p>
+                    <button onclick="loadExercise('functions')" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg font-medium">Start Exercise</button>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">Advanced</span>
+                        <span class="text-gray-500 text-sm">⭐ 4.9</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Async Programming</h3>
+                    <p class="text-gray-600 text-sm mb-4">Understand promises, async/await, and asynchronous JavaScript patterns.</p>
+                    <button onclick="loadExercise('async')" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg font-medium">Start Exercise</button>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                        🎯 Generate Custom Exercise
+                    </h3>
+                    <div class="space-y-3">
+                        <select id="topic-select" class="w-full p-2 border rounded-lg">
+                            <option>Arrays & Objects</option>
+                            <option>Loops & Conditionals</option>
+                            <option>DOM Manipulation</option>
+                            <option>Error Handling</option>
+                        </select>
+                        <select id="difficulty-select" class="w-full p-2 border rounded-lg">
+                            <option>Beginner</option>
+                            <option>Intermediate</option>
+                            <option>Advanced</option>
+                        </select>
+                        <button onclick="generateExercise()" class="w-full bg-purple-500 hover:bg-purple-600 text-white py-2 rounded-lg font-medium">Generate Exercise</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exercise Modal -->
+            <div id="exercise-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+                <div class="bg-white rounded-xl shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                    <div class="p-6 border-b">
+                        <div class="flex items-center justify-between">
+                            <h2 id="exercise-title" class="text-xl font-bold text-gray-800">Exercise Title</h2>
+                            <button onclick="closeExercise()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div id="exercise-content" class="space-y-4">
+                            <!-- Exercise content will be loaded here -->
+                        </div>
+                        <div class="mt-6 flex space-x-4">
+                            <button onclick="checkSolution()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg font-medium">Check Solution</button>
+                            <button onclick="showHint()" class="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded-lg font-medium">Show Hint</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tutorials Tab -->
+        <div id="tutorials-tab" class="tab-content hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <!-- Tutorial Navigation -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Learning Path</h3>
+                    <div class="space-y-2">
+                        <button onclick="loadTutorial('basics')" class="w-full text-left p-3 rounded-lg bg-blue-50 text-blue-700 font-medium">1. Programming Basics</button>
+                        <button onclick="loadTutorial('variables')" class="w-full text-left p-3 rounded-lg hover:bg-gray-50 text-gray-700">2. Variables & Types</button>
+                        <button onclick="loadTutorial('functions')" class="w-full text-left p-3 rounded-lg hover:bg-gray-50 text-gray-700">3. Functions</button>
+                        <button onclick="loadTutorial('objects')" class="w-full text-left p-3 rounded-lg hover:bg-gray-50 text-gray-700">4. Objects & Arrays</button>
+                        <button onclick="loadTutorial('dom')" class="w-full text-left p-3 rounded-lg hover:bg-gray-50 text-gray-700">5. DOM Manipulation</button>
+                    </div>
+                </div>
+
+                <!-- Tutorial Content -->
+                <div class="lg:col-span-3 bg-white rounded-xl shadow-lg">
+                    <div class="p-6 border-b">
+                        <h2 id="tutorial-title" class="text-2xl font-bold text-gray-800">Programming Basics</h2>
+                        <div class="flex items-center mt-2 space-x-4">
+                            <span class="text-sm text-gray-500">📚 Lesson 1 of 5</span>
+                            <div class="flex-1 bg-gray-200 rounded-full h-2">
+                                <div class="bg-blue-500 h-2 rounded-full w-1/5"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div id="tutorial-content" class="prose max-w-none">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-4">Welcome to Programming! 🎉</h3>
+                            <p class="text-gray-600 mb-4">Programming is like giving instructions to a computer. Just like you might tell a friend how to make a sandwich, you tell a computer how to solve problems step by step.</p>
+                            
+                            <h4 class="text-lg font-semibold text-gray-800 mb-2">What is Code?</h4>
+                            <p class="text-gray-600 mb-4">Code is a set of instructions written in a special language that computers understand. Think of it as a recipe - each line tells the computer what to do next.</p>
+                            
+                            <div class="bg-gray-100 p-4 rounded-lg mb-4">
+                                <h5 class="font-semibold text-gray-800 mb-2">Try This Interactive Example:</h5>
+                                <div class="bg-gray-800 text-green-400 p-3 rounded font-mono text-sm mb-2">
+                                    console.log("Hello, World!");
+                                </div>
+                                <button onclick="runTutorialCode('console.log(\"Hello, World!\");')" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm">Run This Code</button>
+                            </div>
+
+                            <h4 class="text-lg font-semibold text-gray-800 mb-2">Key Concepts:</h4>
+                            <ul class="list-disc list-inside text-gray-600 space-y-1 mb-4">
+                                <li><strong>Syntax:</strong> The grammar rules of programming languages</li>
+                                <li><strong>Variables:</strong> Containers that store data</li>
+                                <li><strong>Functions:</strong> Reusable blocks of code</li>
+                                <li><strong>Logic:</strong> Making decisions and repeating actions</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="flex justify-between mt-8">
+                            <button class="px-6 py-2 text-gray-500 hover:text-gray-700">← Previous</button>
+                            <button onclick="loadTutorial('variables')" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-medium">Next Lesson →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.add('hidden');
+            });
+            
+            // Remove active state from all tab buttons
+            document.querySelectorAll('nav button').forEach(btn => {
+                btn.className = 'px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 font-medium';
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName + '-tab').classList.remove('hidden');
+            
+            // Activate selected tab button
+            document.getElementById('tab-' + tabName).className = 'px-4 py-2 rounded-lg bg-blue-500 text-white font-medium';
+        }
+
+        // Code analysis and error detection
+        function analyzeCode() {
+            const code = document.getElementById('code-input').value;
+            const errorDisplay = document.getElementById('error-display');
+            const debugSuggestions = document.getElementById('debug-suggestions');
+            
+            // Simple syntax checking
+            const errors = [];
+            const suggestions = [];
+            
+            // Check for common JavaScript errors
+            if (code.includes('console.log') && !code.includes('console.log(')) {
+                errors.push('❌ Missing parentheses in console.log');
+            }
+            
+            if ((code.match(/\(/g) || []).length !== (code.match(/\)/g) || []).length) {
+                errors.push('❌ Mismatched parentheses');
+            }
+            
+            if ((code.match(/\{/g) || []).length !== (code.match(/\}/g) || []).length) {
+                errors.push('❌ Mismatched curly braces');
+            }
+            
+            // Generate suggestions
+            if (code.includes('var ')) {
+                suggestions.push('💡 Consider using "let" or "const" instead of "var"');
+            }
+            
+            if (!code.includes('function') && code.length > 50) {
+                suggestions.push('💡 Consider breaking your code into functions');
+            }
+            
+            if (code.includes('==') && !code.includes('===')) {
+                suggestions.push('💡 Use "===" for strict equality comparison');
+            }
+            
+            // Display results
+            if (errors.length === 0) {
+                errorDisplay.innerHTML = '<div class="text-green-600 text-sm">✅ No syntax errors detected</div>';
+            } else {
+                errorDisplay.innerHTML = errors.map(error => 
+                    `<div class="text-red-600 text-sm pulse-error">${error}</div>`
+                ).join('');
+            }
+            
+            if (suggestions.length === 0) {
+                debugSuggestions.innerHTML = '<div class="text-gray-500 text-sm">No suggestions at this time</div>';
+            } else {
+                debugSuggestions.innerHTML = suggestions.map(suggestion => 
+                    `<div class="text-blue-600 text-sm">${suggestion}</div>`
+                ).join('');
+            }
+        }
+
+        // Run code functionality
+        function runCode() {
+            const code = document.getElementById('code-input').value;
+            const output = document.getElementById('console-output');
+            
+            // Clear previous output
+            output.innerHTML = '';
+            
+            // Create a safe execution environment
+            try {
+                // Override console.log to capture output
+                const originalLog = console.log;
+                const logs = [];
+                console.log = function(...args) {
+                    logs.push(args.join(' '));
+                };
+                
+                // Execute the code
+                eval(code);
+                
+                // Restore console.log
+                console.log = originalLog;
+                
+                // Display output
+                if (logs.length > 0) {
+                    output.innerHTML = logs.map(log => `<div>${log}</div>`).join('');
+                } else {
+                    output.innerHTML = '<div class="text-gray-400">Code executed successfully (no output)</div>';
+                }
+            } catch (error) {
+                output.innerHTML = `<div class="text-red-400">Error: ${error.message}</div>`;
+            }
+            
+            // Run code analysis
+            analyzeCode();
+        }
+
+        // Exercise functionality
+        const exercises = {
+            variables: {
+                title: "Variables & Data Types",
+                content: `
+                    <h3 class="text-lg font-semibold mb-3">Challenge: Create a Personal Profile</h3>
+                    <p class="text-gray-600 mb-4">Create variables to store information about yourself and display them.</p>
+                    <div class="bg-gray-100 p-4 rounded-lg mb-4">
+                        <h4 class="font-semibold mb-2">Instructions:</h4>
+                        <ol class="list-decimal list-inside space-y-1 text-sm">
+                            <li>Create a variable called "name" with your name</li>
+                            <li>Create a variable called "age" with your age</li>
+                            <li>Create a variable called "isStudent" (true or false)</li>
+                            <li>Use console.log to display all three variables</li>
+                        </ol>
+                    </div>
+                    <textarea id="exercise-code" class="code-editor w-full h-32 p-3 rounded border" placeholder="// Write your solution here..."></textarea>
+                `,
+                solution: `let name = "Alex";
+let age = 25;
+let isStudent = true;
+console.log("Name:", name);
+console.log("Age:", age);
+console.log("Is Student:", isStudent);`,
+                hint: "Remember to use 'let' or 'const' to declare variables, and use quotes for strings!"
+            },
+            functions: {
+                title: "Functions & Parameters",
+                content: `
+                    <h3 class="text-lg font-semibold mb-3">Challenge: Calculator Function</h3>
+                    <p class="text-gray-600 mb-4">Create a function that performs basic math operations.</p>
+                    <div class="bg-gray-100 p-4 rounded-lg mb-4">
+                        <h4 class="font-semibold mb-2">Instructions:</h4>
+                        <ol class="list-decimal list-inside space-y-1 text-sm">
+                            <li>Create a function called "calculate" that takes three parameters: num1, num2, and operation</li>
+                            <li>The function should return the result based on the operation (+, -, *, /)</li>
+                            <li>Test your function with different numbers and operations</li>
+                        </ol>
+                    </div>
+                    <textarea id="exercise-code" class="code-editor w-full h-32 p-3 rounded border" placeholder="// Write your solution here..."></textarea>
+                `,
+                solution: `function calculate(num1, num2, operation) {
+    if (operation === '+') return num1 + num2;
+    if (operation === '-') return num1 - num2;
+    if (operation === '*') return num1 * num2;
+    if (operation === '/') return num1 / num2;
+}
+console.log(calculate(10, 5, '+'));`,
+                hint: "Use if statements to check the operation parameter and return the appropriate calculation!"
+            }
+        };
+
+        function loadExercise(exerciseKey) {
+            const exercise = exercises[exerciseKey];
+            if (exercise) {
+                document.getElementById('exercise-title').textContent = exercise.title;
+                document.getElementById('exercise-content').innerHTML = exercise.content;
+                document.getElementById('exercise-modal').classList.remove('hidden');
+            }
+        }
+
+        function closeExercise() {
+            document.getElementById('exercise-modal').classList.add('hidden');
+        }
+
+        function checkSolution() {
+            const userCode = document.getElementById('exercise-code').value;
+            if (userCode.trim()) {
+                alert('Great job! Your solution looks good. Keep practicing!');
+            } else {
+                alert('Please write some code first!');
+            }
+        }
+
+        function showHint() {
+            const currentExercise = document.getElementById('exercise-title').textContent;
+            let hint = "Try breaking down the problem into smaller steps!";
+            
+            // Find the current exercise and show its hint
+            for (let key in exercises) {
+                if (exercises[key].title === currentExercise) {
+                    hint = exercises[key].hint;
+                    break;
+                }
+            }
+            
+            alert('Hint: ' + hint);
+        }
+
+        function generateExercise() {
+            const topic = document.getElementById('topic-select').value;
+            const difficulty = document.getElementById('difficulty-select').value;
+            
+            const generatedExercise = {
+                title: `${difficulty} ${topic} Challenge`,
+                content: `
+                    <h3 class="text-lg font-semibold mb-3">Generated Challenge: ${topic}</h3>
+                    <p class="text-gray-600 mb-4">This is a ${difficulty.toLowerCase()} level exercise focusing on ${topic.toLowerCase()}.</p>
+                    <div class="bg-gray-100 p-4 rounded-lg mb-4">
+                        <h4 class="font-semibold mb-2">Your Task:</h4>
+                        <p class="text-sm">Create a solution that demonstrates your understanding of ${topic.toLowerCase()}. Focus on clean, readable code and proper ${difficulty.toLowerCase()} level concepts.</p>
+                    </div>
+                    <textarea id="exercise-code" class="code-editor w-full h-32 p-3 rounded border" placeholder="// Write your solution here..."></textarea>
+                `,
+                hint: `Remember to apply ${difficulty.toLowerCase()} level concepts for ${topic.toLowerCase()}!`
+            };
+            
+            document.getElementById('exercise-title').textContent = generatedExercise.title;
+            document.getElementById('exercise-content').innerHTML = generatedExercise.content;
+            document.getElementById('exercise-modal').classList.remove('hidden');
+        }
+
+        // Tutorial functionality
+        const tutorials = {
+            basics: {
+                title: "Programming Basics",
+                content: "Welcome to Programming! 🎉"
+            },
+            variables: {
+                title: "Variables & Data Types",
+                content: `
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Understanding Variables 📦</h3>
+                    <p class="text-gray-600 mb-4">Variables are like labeled boxes that store information. You can put different types of data in them and use them later in your program.</p>
+                    
+                    <h4 class="text-lg font-semibold text-gray-800 mb-2">Types of Data:</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <h5 class="font-semibold text-blue-800">Strings (Text)</h5>
+                            <code class="text-sm">let name = "Alice";</code>
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <h5 class="font-semibold text-green-800">Numbers</h5>
+                            <code class="text-sm">let age = 25;</code>
+                        </div>
+                        <div class="bg-purple-50 p-4 rounded-lg">
+                            <h5 class="font-semibold text-purple-800">Booleans</h5>
+                            <code class="text-sm">let isActive = true;</code>
+                        </div>
+                        <div class="bg-yellow-50 p-4 rounded-lg">
+                            <h5 class="font-semibold text-yellow-800">Arrays</h5>
+                            <code class="text-sm">let colors = ["red", "blue"];</code>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-100 p-4 rounded-lg mb-4">
+                        <h5 class="font-semibold text-gray-800 mb-2">Try This:</h5>
+                        <div class="bg-gray-800 text-green-400 p-3 rounded font-mono text-sm mb-2">
+let greeting = "Hello";<br>
+let userName = "World";<br>
+console.log(greeting + ", " + userName + "!");
+                        </div>
+                        <button onclick="runTutorialCode('let greeting = \"Hello\"; let userName = \"World\"; console.log(greeting + \", \" + userName + \"!\");')" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm">Run This Code</button>
+                    </div>
+                `
+            }
+        };
+
+        function loadTutorial(tutorialKey) {
+            const tutorial = tutorials[tutorialKey];
+            if (tutorial) {
+                document.getElementById('tutorial-title').textContent = tutorial.title;
+                if (tutorial.content) {
+                    document.getElementById('tutorial-content').innerHTML = tutorial.content;
+                }
+                
+                // Update navigation
+                document.querySelectorAll('#tutorials-tab button').forEach(btn => {
+                    btn.className = 'w-full text-left p-3 rounded-lg hover:bg-gray-50 text-gray-700';
+                });
+                event.target.className = 'w-full text-left p-3 rounded-lg bg-blue-50 text-blue-700 font-medium';
+            }
+        }
+
+        function runTutorialCode(code) {
+            const output = document.getElementById('console-output');
+            
+            try {
+                const originalLog = console.log;
+                const logs = [];
+                console.log = function(...args) {
+                    logs.push(args.join(' '));
+                };
+                
+                eval(code);
+                console.log = originalLog;
+                
+                if (logs.length > 0) {
+                    output.innerHTML = logs.map(log => `<div>${log}</div>`).join('');
+                } else {
+                    output.innerHTML = '<div class="text-gray-400">Code executed successfully</div>';
+                }
+            } catch (error) {
+                output.innerHTML = `<div class="text-red-400">Error: ${error.message}</div>`;
+            }
+        }
+
+        // Auto-analyze code as user types
+        document.getElementById('code-input').addEventListener('input', function() {
+            setTimeout(analyzeCode, 500); // Debounce analysis
+        });
+
+        // Initialize with code analysis
+        analyzeCode();
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97e595d8f5489f43',t:'MTc1Nzc0NDkxNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
